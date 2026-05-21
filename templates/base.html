@@ -105,6 +105,27 @@
         .footer-shop a:hover {
             color: var(--shop-gold);
         }
+
+        .chat-fab {
+            position: fixed;
+            right: 1.25rem;
+            bottom: 1.25rem;
+            z-index: 1040;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 14px 32px rgba(15, 23, 42, .25);
+        }
+
+        .chat-fab-label {
+            position: fixed;
+            right: 5rem;
+            bottom: 1.8rem;
+            z-index: 1040;
+        }
     </style>
 </head>
 <body>
@@ -132,6 +153,11 @@
                     {% else %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}"><i class="bi bi-person me-1"></i>Sign in</a></li>
                     {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'chatbot:chat_page' %}">
+                            <i class="bi bi-chat-dots me-1"></i>Help
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link fw-semibold" href="{% url 'cart:cart_detail' %}">
                             <i class="bi bi-cart3 me-1"></i>Cart
@@ -169,6 +195,11 @@
     <main class="py-4">
         {% block content %}{% endblock %}
     </main>
+
+    <span class="chat-fab-label badge text-bg-dark d-none d-md-inline">Offline assistant</span>
+    <a href="{% url 'chatbot:chat_page' %}" class="chat-fab btn btn-warning" aria-label="Open offline chat assistant">
+        <i class="bi bi-chat-dots-fill fs-4"></i>
+    </a>
 
     <footer class="footer-shop mt-5 py-5">
         <div class="container">
