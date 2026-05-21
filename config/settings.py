@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     "cart",
     "orders",
     "reviews",
+    "chatbot",
 ]
 
 MIDDLEWARE = [
