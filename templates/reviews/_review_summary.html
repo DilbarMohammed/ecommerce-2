@@ -1,0 +1,16 @@
+<section class="bg-white border rounded-3 p-4 shadow-sm">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+        <div>
+            <h2 class="h5 mb-1">Customer reviews</h2>
+            {% if review_count %}
+                <div class="d-flex align-items-center gap-2">
+                    {% include "reviews/_rating_stars.html" with rating=average_rating filled_stars=average_star_range empty_stars=average_empty_star_range %}
+                    <span class="fw-semibold">{{ average_rating|floatformat:1 }} out of 5</span>
+                </div>
+                <p class="text-muted mb-0">{{ review_count }} review{{ review_count|pluralize }}</p>
+            {% else %}
+                <p class="text-muted mb-0">No reviews yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>

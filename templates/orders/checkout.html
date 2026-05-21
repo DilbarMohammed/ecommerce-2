@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout | Shop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Checkout</h1>
+            <p class="text-muted mb-0">Confirm shipping details and place your order.</p>
+        </div>
+        <span class="badge text-bg-light border fs-6"><i class="bi bi-shield-check me-1 text-success"></i>Secure demo checkout</span>
+    </div>
+
+    <div class="row g-4">
+        <section class="col-lg-7">
+            <div class="surface rounded-3 p-4">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="rounded-circle bg-warning-subtle text-warning-emphasis d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div>
+                        <h2 class="h5 fw-bold mb-0">Shipping address</h2>
+                        <p class="text-muted small mb-0">Used only for this order snapshot.</p>
+                    </div>
+                </div>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        {% for field in form %}
+                            <div class="{% if field.name == 'address_line_1' or field.name == 'address_line_2' %}col-12{% else %}col-md-6{% endif %}">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% for error in field.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger mt-3">{{ form.non_field_errors }}</div>
+                    {% endif %}
+
+                    <div class="d-flex flex-wrap gap-2 mt-4">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-credit-card me-2"></i>Place order
+                        </button>
+                        <a href="{% url 'cart:cart_detail' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Back to cart
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <aside class="col-lg-5">
+            <div class="surface rounded-3 p-4 sticky-lg-top" style="top: 1rem;">
+                <h2 class="h5 fw-bold mb-3"><i class="bi bi-bag-check me-2 text-warning"></i>Order summary</h2>
+
+                <div class="vstack gap-3">
+                    {% for item in cart_items %}
+                        <div class="d-flex justify-content-between gap-3 border-bottom pb-3">
+                            <div>
+                                <p class="mb-1 fw-semibold">{{ item.product.name }}</p>
+                                <p class="small text-muted mb-0">Qty {{ item.quantity }} x ${{ item.unit_price }}</p>
+                            </div>
+                            <span class="fw-semibold">${{ item.total_price }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <hr>
+                {% if discount %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <span>${{ cart_total }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-success mb-2">
+                        <span>Discount{% if coupon %} ({{ coupon.code }}){% endif %}</span>
+                        <span>-${{ discount }}</span>
+                    </div>
+                {% endif %}
+                <div class="d-flex justify-content-between h5 mb-0">
+                    <span>Total</span>
+                    <span>${{ cart_total_after_discount }}</span>
+                </div>
+                <div class="alert alert-light border mt-4 mb-0 small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Payment is simulated and the order will be marked successful after placement.
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}

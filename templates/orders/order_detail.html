@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Order {{ order.order_number }} | Shop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 mb-1">Order {{ order.order_number }}</h1>
+            <p class="text-muted mb-0">Placed on {{ order.created_at|date:"M d, Y" }}</p>
+        </div>
+        <a href="{{ back_url }}" class="btn btn-outline-secondary">Back to orders</a>
+    </div>
+
+    <div class="row g-4">
+        <section class="col-lg-8">
+            <div class="bg-white border rounded-3 shadow-sm">
+                {% for item in order.items.all %}
+                    <article class="d-flex justify-content-between gap-3 p-3 {% if not forloop.last %}border-bottom{% endif %}">
+                        <div>
+                            <h2 class="h6 mb-1">{{ item.product_name }}</h2>
+                            <p class="text-muted small mb-0">Qty {{ item.quantity }} x ${{ item.unit_price }}</p>
+                        </div>
+                        <span class="fw-semibold">${{ item.line_total }}</span>
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <aside class="col-lg-4">
+            <div class="bg-white border rounded-3 p-4 shadow-sm mb-4">
+                <h2 class="h5 mb-3">Order status</h2>
+                <div class="d-flex justify-content-between">
+                    <span>Status</span>
+                    <span class="badge text-bg-secondary">{{ order.get_status_display }}</span>
+                </div>
+                <hr>
+                {% if order.discount_amount %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <span>${{ order.subtotal_amount }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-success mb-2">
+                        <span>Discount{% if order.coupon_code %} ({{ order.coupon_code }}){% endif %}</span>
+                        <span>-${{ order.discount_amount }}</span>
+                    </div>
+                {% endif %}
+                <div class="d-flex justify-content-between h5 mb-0">
+                    <span>Total</span>
+                    <span>${{ order.total_amount }}</span>
+                </div>
+            </div>
+
+            <div class="bg-white border rounded-3 p-4 shadow-sm">
+                <h2 class="h5 mb-3">Shipping address</h2>
+                <p class="mb-1 fw-semibold">{{ order.full_name }}</p>
+                <p class="mb-1">{{ order.address_line_1 }}</p>
+                {% if order.address_line_2 %}
+                    <p class="mb-1">{{ order.address_line_2 }}</p>
+                {% endif %}
+                <p class="mb-1">{{ order.city }}, {{ order.state }} {{ order.postal_code }}</p>
+                <p class="mb-1">{{ order.country }}</p>
+                <p class="text-muted mb-0">{{ order.phone_number }}</p>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}

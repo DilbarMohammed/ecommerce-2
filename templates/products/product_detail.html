@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} | Shop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'products:product_list' %}">Products</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'products:category_products' product.category.slug %}">{{ product.category.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4 align-items-start">
+        <section class="col-lg-6">
+            <div class="surface rounded-3 p-3">
+                {% if primary_image %}
+                    <img src="{{ primary_image.image.url }}" class="img-fluid rounded-3 w-100 object-fit-cover" alt="{{ primary_image.alt_text|default:product.name }}" style="max-height: 560px;">
+                {% else %}
+                    <div class="product-image-fallback rounded-3 d-flex align-items-center justify-content-center text-muted" style="height: 420px;">
+                        <i class="bi bi-image fs-1"></i>
+                    </div>
+                {% endif %}
+
+                {% if gallery_images|length > 1 %}
+                    <div class="row row-cols-4 g-2 mt-3">
+                        {% for image in gallery_images %}
+                            <div class="col">
+                                <img src="{{ image.image.url }}" class="img-fluid border rounded-2 object-fit-cover {% if image == primary_image %}border-warning border-2{% endif %}" alt="{{ image.alt_text|default:product.name }}" style="height: 90px; width: 100%;">
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="col-lg-6">
+            <div class="surface rounded-3 p-4">
+                <p class="text-muted mb-1"><i class="bi bi-tag me-1"></i>{{ product.category.name }}</p>
+                <h1 class="display-6 fw-bold">{{ product.name }}</h1>
+
+                <div class="my-3">
+                    {% if product.has_discount %}
+                        <div class="d-flex align-items-baseline gap-3">
+                            <span class="h3 text-danger mb-0">${{ product.discount_price }}</span>
+                            <span class="h5 text-muted text-decoration-line-through mb-0">${{ product.price }}</span>
+                        </div>
+                    {% else %}
+                        <span class="h3 mb-0">${{ product.price }}</span>
+                    {% endif %}
+                </div>
+
+                {% if product.in_stock %}
+                    <p class="badge text-bg-success">In stock</p>
+                    {% if product.stock <= 5 %}
+                        <p class="text-warning fw-semibold small">Only {{ product.stock }} left in stock.</p>
+                    {% endif %}
+                {% else %}
+                    <p class="badge text-bg-danger">Out of stock</p>
+                {% endif %}
+
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    {% if product.can_be_purchased %}
+                        <form method="post" action="{% url 'cart:cart_add' product.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.path }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-cart-plus me-2"></i>Add to cart
+                            </button>
+                        </form>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'accounts:wishlist_toggle' product.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.path }}">
+                            <button type="submit" class="btn {% if is_in_wishlist %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                                <i class="bi bi-heart{% if is_in_wishlist %}-fill{% endif %} me-2"></i>
+                                {% if is_in_wishlist %}Saved{% else %}Wishlist{% endif %}
+                            </button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-outline-danger">
+                            <i class="bi bi-heart me-2"></i>Sign in to save
+                        </a>
+                    {% endif %}
+                </div>
+
+                <hr>
+
+                <div class="lead fs-6">
+                    {{ product.description|linebreaks }}
+                </div>
+            </div>
+        </section>
+    </div>
+
+    {% include "products/_product_carousel_section.html" with title="Related products" products=related_products %}
+    {% include "products/_product_carousel_section.html" with title="Recommended for you" products=recommended_products %}
+    {% include "products/_product_carousel_section.html" with title="Recently viewed" products=recently_viewed_products %}
+</div>
+{% endblock %}

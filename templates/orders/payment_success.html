@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Successful | Shop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="bg-white border rounded-3 p-5 text-center shadow-sm">
+                <div class="display-5 text-success mb-3">Payment successful</div>
+                <h1 class="h3">Thanks for your order</h1>
+                <p class="text-muted mb-4">Order {{ order.order_number }} has been placed successfully.</p>
+
+                <div class="border rounded-3 p-3 text-start mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Status</span>
+                        <span class="badge text-bg-success">{{ order.get_status_display }}</span>
+                    </div>
+                    {% if order.discount_amount %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Discount{% if order.coupon_code %} ({{ order.coupon_code }}){% endif %}</span>
+                            <span class="text-success">-${{ order.discount_amount }}</span>
+                        </div>
+                    {% endif %}
+                    <div class="d-flex justify-content-between">
+                        <span>Total</span>
+                        <span class="fw-bold">${{ order.total_amount }}</span>
+                    </div>
+                </div>
+
+                <a href="{% url 'orders:order_detail' order.order_number %}" class="btn btn-warning">View order</a>
+                <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary">Continue shopping</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

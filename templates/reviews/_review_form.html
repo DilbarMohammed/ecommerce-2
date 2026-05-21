@@ -1,0 +1,57 @@
+<section class="bg-white border rounded-3 p-4 shadow-sm">
+    <h2 class="h5 mb-3">{% if user_review %}Update your review{% else %}Write a review{% endif %}</h2>
+
+    {% if user.is_authenticated %}
+        <form method="post" action="{% url 'reviews:review_save' product.slug %}" novalidate>
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label d-block">Rating</label>
+                <div class="d-flex flex-wrap gap-3">
+                    {% for choice in review_form.rating %}
+                        <div class="form-check">
+                            {{ choice.tag }}
+                            <label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% for error in review_form.rating.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ review_form.title.id_for_label }}" class="form-label">Title</label>
+                {{ review_form.title }}
+                {% for error in review_form.title.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ review_form.comment.id_for_label }}" class="form-label">Review</label>
+                {{ review_form.comment }}
+                {% for error in review_form.comment.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <button type="submit" class="btn btn-warning">Save review</button>
+                {% if user_review %}
+                    <button type="submit" form="delete-review-form" class="btn btn-outline-danger">Delete review</button>
+                {% endif %}
+            </div>
+        </form>
+
+        {% if user_review %}
+            <form id="delete-review-form" method="post" action="{% url 'reviews:review_delete' product.slug %}">
+                {% csrf_token %}
+            </form>
+        {% endif %}
+    {% else %}
+        <p class="text-muted mb-0">
+            <a href="{% url 'accounts:login' %}">Sign in</a> to write a review.
+        </p>
+    {% endif %}
+</section>
